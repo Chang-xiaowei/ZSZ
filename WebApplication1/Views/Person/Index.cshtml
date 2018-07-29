@@ -1,0 +1,37 @@
+﻿<form id="formData" >
+  姓名：  <input id="name" name="name" type="text"><br />
+    <input id="age" name="age" type="text"><br />
+    <input id="height" name="height" type="text"><br />
+    <input id="weight" name="weight" type="text"><br />
+    <input id="idkey" name="idkey" type="text"><br />
+    <input type="button" id="btnAdd" value="添加"/>
+</form>
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#btnAdd").click(function () {
+            var data = $("#formData").serializeArray();
+            $.ajax({
+                url: "/Person/Delete",
+                dataType: "json", type: "post",
+                data:data, //{ name: $("#name").val(), age: $("#age").val(), height: $("#height").val(), weight: $("#weight").val() },
+                success:function (res) {
+                    if(res.status=="ok")
+                    {
+                        alert("添加成功");
+                    }
+                    else
+                    {
+                        alert(res.error);
+                    }
+                },
+                error: function ()
+                {
+                    alert("网络请求出错");
+                }
+            });
+        });
+            
+    });
+</script>

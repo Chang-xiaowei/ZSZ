@@ -1,0 +1,54 @@
+﻿@model ZSZ.Admin.Web.Models.RoleEditGetModel
+@{
+    ViewBag.Title = "角色编辑";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form id="formEdit">
+    <input type="hidden" name="id" id="id" value="@Model.Role.Id"  />
+    名称<input type="text" name="name" id="name" value="@Model.Role.Name" />
+    <div class="row c1">
+        @foreach (var perm in Model.AllPerms)
+        {
+            <div class="col-xs-12 col-sm-3">
+                <input type="checkbox" checked="@Model.RolePerms.Select(p=>p.Id).Contains(perm.Id)" id="PermissionIds_@perm.Id" name="PermissionIds" value="@perm.Id" />
+                <label for="@perm.Id">@perm.Description</label>
+            </div>
+        }
+    </div>
+    <input type="button" value="修改" id="btnSave" />
+</form>
+@section FooterScript
+{
+    <script type="text/javascript">
+        $(function ()
+        {
+            $("#btnSave").click(function ()
+            {
+                var formEdit = $("#formEdit").serializeArray();
+                $.ajax({
+                    url: "/Role/Edit",
+                    type: "post",
+                    data:formEdit,
+                    //data: {id:$("#id").val(), name: $("#name").val(), description: $("#description").val() },
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.status == "ok")
+                        {
+                            alert("修改成功");
+                            parent.location.reload();
+                        }
+                        else
+                        {
+                            alert("error");
+                        }
+                    },
+                    error: function ()
+                    {
+                        alert("请求出错");
+                    }
+                });
+            });
+        });
+    </script>
+}

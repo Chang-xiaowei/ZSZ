@@ -1,0 +1,20 @@
+﻿@using WebApplication1.Models
+               第一种<br />
+   @foreach (var item in (List<PersonModel>)ViewBag.data)
+    {
+     <td> <input type="text" />    @item.Name</td><br />
+     <td> <input type="text" />  @item.Weight</td><br />
+     <td> <input type="text" />  @item.Age</td><br />
+     <td>
+         <input type="text" />  @item.Height
+     </td><br />
+   }
+                 第二种<br />
+       
+        @foreach (var item in (List<PersonModel>)Model)
+        {
+            @item.Age  <br />
+             @item.Name <br />
+             @item.Weight <br />
+        }
+

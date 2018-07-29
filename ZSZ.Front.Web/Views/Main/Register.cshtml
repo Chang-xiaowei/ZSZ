@@ -1,0 +1,77 @@
+﻿
+    <div class="headertwo clearfloat" id="header">
+        <a href="javascript:history.go(-1)" class="fl box-s"><i class="iconfont icon-arrow-l fl"></i></a>
+        <p class="fl">用户注册</p>
+    </div>
+<form id="formData">
+    <div class="register clearfloat" id="main">
+        <ul>
+            <li class="clearfloat">
+                <p class="tit fl">手机号</p>
+                <input type="text" name="phoneNum" id="phoneNum" value="" class="shuru fl" placeholder="请输入手机号码" />
+            </li>
+            <li class="clearfloat">
+                <p class="tit fl">验证码</p>
+                <div>
+                    <input type="text" name="verifyCode" id="" value="" class="shuru shurutwo fl" placeholder="请输入验证码" />
+                    <img src="/Main/CreateVerifyCode" id="imgVerifyCode" />
+                    <a id="kanbuq" href="javascript:;">看不清，换一张</a>
+                </div>
+            </li>
+            <li class="clearfloat">
+                <p class="tit fl">密码</p>
+                <input type="text" name="password" id="password" value="" class="shuru fl" placeholder="请设置密码" />
+            </li>
+            <li class="clearfloat">
+                <p class="tit fl">确认密码</p>
+                <input type="text" name="password" id="password" value="" class="shuru fl" placeholder="请再次输入密码" />
+            </li>
+        </ul>
+        <div class="glyphicon-th-large">
+           <input id="btnRegister" name="btnRegister" type="button" value="注册" />
+        </div>
+        <div class="bottom clearfloat">
+            <p class="fl">
+                已有账号？
+                <a href="/Main/Login">立即登录</a>
+            </p>
+        </div>
+    </div>
+</form>
+>
+@section FooterScript
+{
+ <script type="text/javascript" src="~/js/jquery.SuperSlide.2.1.js"></script>
+ <script type="text/javascript" src="~/js/jquery.leanModal.min.js"></script>  
+    <script type="text/javascript">
+        $(function () {
+            $("#imgVerifyCode,#kanbuq").click(function () {
+                $("#imgVerifyCode").attr("src", "/Main/CreateVerifyCode?" + Math.random());
+                $("#imgVerifyCode").click();
+            });
+            $("#btnRegister").click(function () {
+                var formData = $("#formData").serializeArray();
+                $.ajax({
+                    url: "/Main/Register", dataType: "json", type: "post",
+                    data: formData,
+                    success: function (res)
+                    {
+                        if(res.status=="ok")
+                        {
+                            alert("注册成功");
+                        }
+                        else
+                        {
+                            alert(res.errorMsg);
+                        }
+                    },
+                    error: function (res)
+                    {
+                        alert(res.errorMsg);
+                    }
+                });
+            });
+        });
+    </script>
+
+}

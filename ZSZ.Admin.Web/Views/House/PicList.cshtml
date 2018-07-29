@@ -1,0 +1,62 @@
+﻿@model HousePicDTO[]
+<link href="~/lib/lightbox2/2.8.1/css/lightbox.css" rel="stylesheet" type="text/css">    
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 图片管理 <span class="c-gray en">&gt;</span> 图片展示 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+    <div class="pd-20">
+        <div class="cl pd-5 bg-1 bk-gray mt-20"> 
+            <span class="l"> 
+             <a href="javascript:;" onclick="BatchDelete()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+             </span>
+         <span class="r">共有数据：<strong>@Model.Length</strong> 条</span>
+         </div>
+        <div class="portfolio-content">           
+            <ul class="cl portfolio-area">
+               @foreach (var pic in Model)
+               {
+                <li class="item">
+                    <div class="portfoliobox">
+                        <input class="checkbox" id="pic_@pic.Id" name="selectedIds" type="checkbox" value="@pic.Id">
+                        <div class="picbox"><a href="@pic.Url" data-lightbox="gallery" data-title="客厅1"><img src="@pic.ThumbUrl"></a></div>                       
+                    </div>
+                </li>
+               }                             
+            </ul>
+        </div>
+    </div>
+ @section FooterScript
+{
+    <script type="text/javascript" src="~/lib/lightbox2/2.8.1/js/lightbox-plus-jquery.min.js"></script> 
+    <script type="text/javascript">
+       $(function ()
+      {
+	      $.Huihover(".portfolio-area li");
+       });
+        //批量删除
+       function BatchDelete()
+       {
+           var ids = new Array();
+           $('input[name="selectedIds"]:checked').each(function ()
+           {
+               ids.push($(this).val());//向数组中添加元素  
+           });
+           //var idstr = ids.join(',');//将数组元素连接起来以构建一个字符串  
+           //alert(idstr);
+           $.ajax({
+               url: "/House/DeletePics",
+               dataType: "json", type: "post",
+               data: {selectedIds:ids},
+               success: function (res) {
+                   if (res.status == "ok") {
+                       //alert("删除成功")
+                       location.reload();
+                   }
+                   else {
+                       alert("删除失败")
+                   }
+               }, error: function () {
+                   alert("网络请求出错，请稍后重试！");
+               }
+           });
+       } 
+    </script>
+}
+  

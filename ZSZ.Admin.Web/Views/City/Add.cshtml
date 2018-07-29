@@ -1,0 +1,50 @@
+﻿@model ZSZ.DTO.PermissionDTO[]
+@{
+    ViewBag.Title = "新增城市";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form id="formAdd">
+    <div class="row c1">
+            <label ><span class="c-red">*</span>城市：</label>       
+            <input type="text" id="name" name="name" dataType="*1-50" nullmsg="城市名称不能为空" />
+     </div>
+    <div class="row c1">           
+        <input type="button" id="btnAdd" name="btnAdd" value="添加" />          
+        </div>
+    
+</form>
+@section FooterScript 
+{
+    <script type="text/javascript">
+        var saveAjax = function () {
+            var formData = $("#formAdd").serializeArray();
+            $.ajax({
+                url: "/City/Add",
+                dataType: "Json", type: "post",
+                data: formData,
+                success: function (res) {
+                    if (res.status == "ok") {
+                        //alert("ok");
+                        parent.location.reload();//刷新父窗口
+                    }
+                    else
+                    {
+                        alert("error");
+                    }
+                },
+                error: function () { alert("请求出错"); }
+            });
+        };
+        $(function () {
+            var validForm = $("#formAdd").Validform({ tiptype: 3 });
+            $("#btnAdd").click(function () {
+                if (validForm.check(false)) {
+                    saveAjax();
+                }             
+            });
+            
+        });
+    </script>
+}
+

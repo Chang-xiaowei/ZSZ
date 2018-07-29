@@ -1,0 +1,153 @@
+﻿@model ZSZ.Admin.Web.Models.AdminUserEditViewModel
+@{
+    ViewBag.Title = "编辑操作员";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="pd-20">
+    <form action="" method="post" class="form form-horizontal" id="form-admin-edit">
+        <div>
+            <input type="hidden" name="Id" value="@Model.AdminUser.Id" />
+        </div>
+        <!--手机号-->
+        <div class="row cl">
+            <label class="form-label col-3"><span class="c-red">*</span>手机号：</label>
+            <div class="formControls col-5">
+                <input type="text" readonly="readonly" class="input-text" value="@Model.AdminUser.PhoneNum" id="phoneNum" name="phoneNum" datatype="*2-16" nullmsg="请填写2到16位任意字符">
+            </div>
+            <div class="col-4"> </div>
+        </div>
+        <!--姓名-->
+        <div class="row cl">
+            <label class="form-label col-3"><span class="c-red">*</span>姓名：</label>
+            <div class="formControls col-5">
+                <input type="text" class="input-text" value="@Model.AdminUser.Name" placeholder="请输入真实姓名" id="name" name="name" datatype="*2-16" nullmsg="请填写2到16位任意字符！">
+            </div>
+            <div class="col-4"> </div>
+        </div>
+
+        <!--密码-->
+        <div class="row cl">
+            <label class="form-label col-3"><span class="c-red">*</span>初始密码：</label>
+            <div class="formControls col-5">
+                <input id="password" name="password" type="password" placeholder="留空则为不修改密码"  value="" class="input-text" datatype="*0-10" nullmsg="密码不能为空" >
+            </div>
+            <div class="col-4"> </div>
+        </div>
+        <!--确认密码-->
+        <div class="row cl">
+            <label class="form-label col-3"><span class="c-red">*</span>确认密码：</label>
+            <div class="formControls col-5">
+                <input id="password2" name="password2" type="password" placeholder="留空则为不修改密码" class="input-text" " datatype="*0-10" nullmsg="请再输入一次新密码！" recheck="password" >
+                @*<input type="password" placeholder="留空则为不修改密码" autocomplete="off" class="input-text" errormsg="您两次输入的新密码不一致！" datatype="*0-10" nullmsg="请再输入一次新密码！" recheck="password" id="password2" name="password2">*@
+            </div>
+            <div class="col-4"> </div>
+        </div>
+        <!--邮箱-->
+        <div class="row cl">
+            <label class="form-label col-3"><span class="c-red">*</span>邮箱：</label>
+            <div class="formControls col-5">
+                <input type="email" value="@Model.AdminUser.Email" class="input-text" placeholder="" name="email" id="email" datatype="e" nullmsg="请输入邮箱！">
+            </div>
+            <div class="col-4"> </div>
+        </div>
+        <!--城市-->
+        <div class="row cl">
+            <label class="form-label col-3">城市：</label>
+            <div class="formControls col-5">
+                @*<select class="select" id="cityId" name="cityId" size="1">
+                   
+                    @foreach (var city in Model.Cities)
+                    {
+                        if (@Model.CityId == city.Id)
+                        {
+                            <option selected="selected" id="@Model.CityId" value="@Model.CityId">@city.Name</option>
+                        }
+                        else
+                        {
+                            <option  id="@city.Id" value="@city.Id">@city.Name</option>
+                        }
+                    }
+                </select>*@
+                @Html.DropDownList("cityId", new SelectList(Model.Cities,
+                    nameof(CityDTO.Id), nameof(CityDTO.Name), Model.CityId))
+
+            </div>
+        </div>
+        <!--角色-->
+        <div class="row cl">
+            <label class="form-label col-3">角色：</label>
+            <div class="col-xs-12 col-sm-5">
+                @foreach (var role in Model.AllRoles)
+                {
+                    <input type="checkbox" checked="@(Model.UserRoleIds.Contains(role.Id))" name="RoleIds" id="roleIds_@role.Id" value="@role.Id">
+                    <label for="roleIds_@role.Id">@role.Name</label>
+                }
+            </div>
+        </div>
+        <!--提交-->
+        <div class="row cl">
+            <div class="col-9 col-offset-3">
+                <input id="sumbit" class="btn btn-primary radius" type="button" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </form>
+</div>
+@section FooterScript
+{
+    <script type="text/javascript">
+        // $("#cityId").find("option:selected").text();
+        var savaAjax = function () {
+            var dataForm = $("#form-admin-edit").serializeArray();
+            $.ajax({
+                url: "/AdminUser/Edit",
+                dataType: "json", type: "post",
+                data: dataForm,
+                success: 
+                    function (res) {
+                    if (res.status == "ok") {
+                        parent.location.reload();//刷新父窗口
+                        alert("修改成功")
+                    }
+                    else {
+                        alert(res.errorMsg);
+                    }
+                },
+                error: function () {
+                    alert("请求失败！");
+                }
+            });
+        };
+        $(function () {
+            var vaildForm = $("#form-admin-edit").Validform({ tiptype: 2 });
+            $("#sumbit").click(function () {
+                if (vaildForm.check(false)) {
+                    savaAjax();
+                }
+            });
+            //焦点离开事件
+            $("#phoneNum").blur(function () 
+            {
+                var phoneNum = $(this).val();
+                if (phoneNum.length <= 0) return;
+                $.ajax({
+                    url: "/AdminUser/CheckPhoneNum",
+                    dataType: "json", type: "post",
+                    data: { phoneNum: phoneNum,userId:@Model.AdminUser.Id},
+                    success: function (res) 
+                    {
+                        if (res.status == "exsits") 
+                        {
+                            layer.msg('这个手机号已经被其他人使用了!', { icon: 2, time: 2000 });
+                        }
+                    },
+                    error: function () {
+                        alert("网络通讯错误");
+                    }
+                });
+            });
+
+        });
+    </script>
+
+}
+

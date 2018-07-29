@@ -1,0 +1,40 @@
+﻿@model ZSZ.DTO.PermissionDTO
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form id="formEdit">
+    <input type="hidden" name="id" id="id" value="@Model.Id" />
+    名称<input type="text" name="name" id="name" value="@Model.Name" />
+    描述<input type="text" name="description" id="description" value="@Model.Description" />
+    <input type="button" value="保存" id="btnSave" />
+</form>
+@section FooterScript
+{
+    <script type="text/javascript">
+        $(function () {
+            $("#btnSave").click(function ()
+            {
+                var formEdit = $("#formEdit").serializeArray();
+                $.ajax({
+                    url: "/Permission/Edit",
+                    type: "post",
+                    data:formEdit,
+                    //data: {id:$("#id").val(), name: $("#name").val(), description: $("#description").val() },
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.status=="ok"){
+                            parent.location.reload();
+                        } else {
+                            alert("error")
+                        }
+                    },
+                    error: function myfunction() {
+                        alert("请求出错");
+                    }
+                });
+            });
+        });
+    </script>
+}

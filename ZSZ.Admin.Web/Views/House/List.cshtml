@@ -1,0 +1,145 @@
+﻿@model ZSZ.DTO.HouseDTO[]
+@{
+    ViewBag.Title = "房源列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    #pager li
+     {
+        float:left;margin-left:5px;color:purple
+    }
+    .curPager 
+    {
+        font-size:xx-large        
+    }
+</style>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页<span class="c-gray en">&gt;</span> 房源管理<span class="c-gray en">&gt;</span>房源列表  <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"> <i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+     <span class="l">
+        <a href="javascript:;" onclick="batchdel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> 
+        <a href="javascript:;" onclick="admin_add('添加用户','/House/Add','','510')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加房源</a>
+     </span> <span class="r">共有数据：<strong>@Model.Length</strong> 条</span> </div>
+    <form id="formList">
+        <div class="mt-20">
+            <table class="table table-border table-bordered table-hover table-bg table-sort">
+                <thead>
+                    <tr class="text-c">
+                        <th width="25"><input type="checkbox" name="" value=""></th>
+                        <th width="100">区域</th>
+                        <th width="150">小区名称</th>
+                        <th width="200">地段</th>
+                        <th width="100">租金</th>
+                        <th width="100">房型</th>
+                        <th width="100">面积</th>
+                        <th width="70">装修</th>
+                        <th width="100">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var house in Model)
+                    {
+                        <tr class="text-c">
+                            <td><input type="checkbox" value="@house.Id" id="selectIds" name="selectIds"></td>
+                            <td>@house.RegionName</td>
+                            <td>@house.CommunityName</td>
+                            <td>@house.CommunityLocation</td>
+                            <td>@house.MonthRent</td>
+                            <td>@house.RoomTypeName</td>
+                            <td>@house.Area</td>
+                            <td>@house.DecorateStatusName</td>
+                            <td class="td-manage">
+                                <a title="编辑" href="javascript:;" onclick="house_edit('房源编辑','/House/Edit/@house.Id','800','510')" class="ml-5" style="text-decoration:none">
+                                    <i class="Hui-iconfont">&#xe6df;</i> </a>
+                                <a title="删除" href="javascript:;" onclick="house_del(this,'@house.Id')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
+                                <a title="查看图片" href="javascript:;" onclick="layer_show('查看图片','/House/PicList?id=@house.Id','800','510')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe613;</i></a>
+                                <a title="上传图片" href="javascript:;" onclick="layer_show('上传图片','/House/PicUpload?houseId=@house.Id','800','510')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe642;</i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </form>
+    @{ 
+        var pager = new ZSZ.CommonMVC.RuPengPager();
+        pager.MaxPagerCount = 10;
+        pager.PageIndex =ViewBag.pageIndex;
+        pager.PageSize = 10;
+        pager.TotalCount =(int)ViewBag.totalCount;
+        pager.UrlPattern = "/House/List?typeId="+ViewBag.TypeId+"&pageIndex={pn}";
+        pager.CurrentPageClassName = "curPager";
+
+    }
+    <div id="pager">
+        @Html.Raw(pager.GetPagerHtml())
+    </div>
+</div>
+@section FooterScript
+{
+    <script type="text/javascript">
+
+        function admin_add(title, url, w, h) {
+            layer_show(title, url, w, h);
+        }
+        /*批量删除*/
+        function batchdel()
+        {
+            layer.confirm("确认要批量删除这些数据吗", function () {
+                var formData = $("#formList").serializeArray();
+                $.ajax({
+                    url: "/House/BatchDelete",
+                    dataType: "json", type: "post",
+                    data: formData,
+                    success: function (res)
+                    {
+                        if (res.status == "ok")
+                        {
+                            location.reload();
+                            layer.msg('已删除!', { icon: 1, time: 1000 });
+                        }
+                        else
+                        {
+                            alert("删除失败");
+                        }
+                    },
+                    error: function ()
+                    {
+                        alert("网络请求出错");
+                    }
+                });
+            });
+        }
+        /*房源-编辑*/
+        function house_edit(title, url, w, h) {
+            layer_show(title, url, w, h);
+        }
+        /*房源-删除*/
+        function house_del(obj, id) {
+            layer.confirm('确认要删除吗？', function (index) {
+                $.ajax({
+                    url: "/House/Delete/" + id,
+                    dataType: "json", type: "post",
+                    success: function (res)
+                    {
+                        if (res.status=="ok")
+                        {
+                            location.reload();
+                            $(obj).parents("tr").remove();
+                            layer.msg('已删除!', { icon: 1, time: 1000 });
+                        }
+                        else
+                        {
+                            layer.msg('删除失败!', { icon: 1, time: 1000 });
+                        }
+                    },
+                    error: function ()
+                    {
+                        alert("网络请求错误");
+                    }
+                });                
+            });
+        }
+    </script>
+}
+

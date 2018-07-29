@@ -1,0 +1,155 @@
+﻿@model ZSZ.DTO.HouseAppointmentDTO[]
+@{
+    ViewBag.Title = "预约看房列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    #pager li
+     {
+        float:left;margin-left:5px;color:purple
+    }
+    .curPager 
+    {
+        font-size:xx-large        
+    }
+</style>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页<span class="c-gray en">&gt;</span> 房源管理<span class="c-gray en">&gt;</span>房源列表  <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"> <i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+    <form id="formList">
+        <div class="mt-20">
+            <table class="table table-border table-bordered table-hover table-bg table-sort">
+                <thead>
+                    <tr class="text-c">                       
+                        <th width="100">姓名</th>
+                        <th width="150">电话</th>
+                        <th width="200">预约时间</th>
+                        <th width="100">看房时间</th>
+                        <th width="100">小区</th>
+                        <th width="100">地址</th>
+                        <th width="70">状态</th>
+                        <th width="100">跟进员工</th>
+                        <th width="100">查看房源</th>
+                        <th width="100">接单</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var app in Model)
+                    {
+                        <tr class="text-c">
+                            <td>@app.Name</td>
+                            <td>@app.PhoneNum</td>
+                            <td>@app.CreateDateTime</td>
+                            <td>@app.VisitDate</td>
+                            <td>@app.CommunityName</td>
+                            <td>@app.HouseAddress</td>
+                            <td>@app.Status</td>
+                            <td>@app.FollowAdminUserName</td>
+                            <td><a href="~/House/Edit/@app.HouseId" target="_blank">查看房源</a></td>
+                            <td class="td-manage">
+                                <a title="抢单" href="javascript:;" onclick="follow(@app.Id)"><i class="Hui-iconfont">&#xe6d0;</i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </form>
+  
+    
+</div>
+@section FooterScript
+{
+    <script type="text/javascript">
+        //抢单
+        function follow(appid) 
+        {
+            $.ajax({
+                url:"/HouseAppointment/Follow",
+                dataType:"json",type:"post",
+                data:{appid:appid},
+                success:function (res) 
+                {
+                    if (res.status=="ok")
+                    {
+                        alert("抢单成功");
+                    }
+                    else if(res.status=="fail")
+                    {
+                        alert("抢单失败");    
+                    }
+                    else
+                    {
+                        alert("未知错误");    
+                    }
+                },
+                error:function ()
+                {
+                    alert("网络请求错误");    
+                }
+            });    
+        }
+
+        function admin_add(title, url, w, h) {
+            layer_show(title, url, w, h);
+        }
+        /*批量删除*/
+        function batchdel()
+        {
+            layer.confirm("确认要批量删除这些数据吗", function () {
+                var formData = $("#formList").serializeArray();
+                $.ajax({
+                    url: "/House/BatchDelete",
+                    dataType: "json", type: "post",
+                    data: formData,
+                    success: function (res)
+                    {
+                        if (res.status == "ok")
+                        {
+                            location.reload();
+                            layer.msg('已删除!', { icon: 1, time: 1000 });
+                        }
+                        else
+                        {
+                            alert("删除失败");
+                        }
+                    },
+                    error: function ()
+                    {
+                        alert("网络请求出错");
+                    }
+                });
+            });
+        }
+        /*房源-编辑*/
+        function house_edit(title, url, w, h) {
+            layer_show(title, url, w, h);
+        }
+        /*房源-删除*/
+        function house_del(obj, id) {
+            layer.confirm('确认要删除吗？', function (index) {
+                $.ajax({
+                    url: "/House/Delete/" + id,
+                    dataType: "json", type: "post",
+                    success: function (res)
+                    {
+                        if (res.status=="ok")
+                        {
+                            location.reload();
+                            $(obj).parents("tr").remove();
+                            layer.msg('已删除!', { icon: 1, time: 1000 });
+                        }
+                        else
+                        {
+                            layer.msg('删除失败!', { icon: 1, time: 1000 });
+                        }
+                    },
+                    error: function ()
+                    {
+                        alert("网络请求错误");
+                    }
+                });                
+            });
+        }
+    </script>
+}
+

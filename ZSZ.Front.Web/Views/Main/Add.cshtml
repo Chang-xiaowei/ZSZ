@@ -1,0 +1,30 @@
+﻿
+<form id="formData">
+   手机号 <input type="text" id="phoneNum" name="phoneNum" placeholder="手机号"/>
+    密码<input type="text" id="password" name="password"/>
+    <input type="button" id="btnAdd" value="添加" />
+</form>
+<script src="~/js/jquery-1.8.3.min.js"></script>
+<script src="~/js/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#btnAdd").click(function () {
+            var formData = $("#formData").serializeArray();
+            $.ajax({
+                url: "/Main/Add",
+                dataType: "json", type: "post",
+                data: formData,
+                success: function (res) {
+                    if(res.status=="ok")
+                    {
+                        alert("添加成功")
+                    }
+                },
+                error: function ()
+                {
+                    alert("网络请求错误");
+                }
+            });
+        });
+    });
+</script>
